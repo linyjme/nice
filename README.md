@@ -45,7 +45,8 @@
         聊天室用户:room_user
 
     6.设计文件说明
-            ├── client
+        .
+        ├── client
         │   ├── client.py
         │   └── connfig.py
         ├── demand
@@ -73,7 +74,9 @@
         └── ui
             ├── backgr.gif
             ├── client_main.py
-            └── tkinter01.py
+            ├── tkinter01.py
+            └── ui.py
+
 
 
 

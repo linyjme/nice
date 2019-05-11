@@ -67,6 +67,10 @@ class MySql(object):
     def create_user_tb(self):
         """
             创建用户表
+            编号：id
+            用户账号:uid
+            用户名:uname
+            用户密码:upwd
         """
         # 进入chat数据库
         self.cur.execute("use chat;")
@@ -82,13 +86,25 @@ class MySql(object):
         """
             创建历史记录
         """
-        pass
+        
 
-    def create_add_fir_tb(self):
+    def create_firs_tb(self):
         """
             创建添加好友数据库
+            好友表
+            编号:id
+            主用户:uid
+            好友:ufid
         """
-        pass
+        sql = """create table friends (id int auto_increment ,uid varchar(32) primary key
+        ,ufid varchar(32) not null;
+        """
+        # 创建friends表
+        self.cur.execute(sql)
+        print("创建friends表成功")
+        return True
+
+        
 
 
 

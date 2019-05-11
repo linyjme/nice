@@ -5,13 +5,16 @@
 
     用户表：
             user 
+        编号：id
         用户账号:uid
         用户名:uname
         用户密码:upwd
     
     好友列表：
             friends
-        
+        编号:id
+        主用户:uid
+        好友:ufid
 
     历史记录表：
             chat_history

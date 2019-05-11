@@ -1,5 +1,6 @@
 """
     数据库tool模块
+    对数据库的查找，写入，删除操作
 
 """
 import pymysql
@@ -57,4 +58,32 @@ class Sql_tool():
         """
             存储添加好友信息
         """
-        sql = ""
+        sql = "insert into friends (uid ,fuis) values ('%s','%s')"%(uid,fuid)
+        try:
+            self.sql_tool.cur.execute(sql)
+            self.sql_tool.db_conn.commit()
+            return True
+        except:
+            self.sql_tool.db_conn.rollback()
+            return False
+
+
+    def query_friens_by_uid(self,uid):
+        """
+            通过用户名查询所有好友
+        """
+        temp_list = []
+        sql = "select * from user where uid = '%s' " % uid
+        result = self.sql_tool.cur.execute(sql)
+        print(result)
+        if result == None:
+            return False
+        
+        for info in result:
+            temp_dict = {}
+            uid = info[1]
+            fuid = info[2]
+            temp_dict[uid] = fuid
+            temp_list.append(temp_dict)
+        return temp_list
+

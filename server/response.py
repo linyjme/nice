@@ -44,7 +44,6 @@ class Response(object):
         self.tool.record_user_status(uid,addr)
         
         
-          
 
     def do_register(self,c,request,addr):
         """
@@ -93,6 +92,14 @@ class Response(object):
         """
         pass
     
+    def do_joinfriend(self,c,request,addr):
+        """
+            加好友的功能
+        """
+        fuid = request['fuid']
+        uid = request['uid']
+        # 查询好友关系
+        
 
 
 

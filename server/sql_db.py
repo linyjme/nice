@@ -1,9 +1,11 @@
 """
     sql模块
 """
-from connfig import *
+
 import pymysql
 import sys
+from connfig import *
+
 
 """
     开始服务器后，先判断是否存在chat数据库,
@@ -11,7 +13,7 @@ import sys
     如果chat数据库不存在，则创建chat数据库，然后建立表
 
 """
-class ConnSql(object):
+class MySql(object):
     def __init__(self):
         self.db_conf = DbConf()
 
@@ -43,9 +45,7 @@ class ConnSql(object):
             print("连接数据库错误")
             print(e)
             sys.exit("数据库连接失败，程序退出")
-            
-        # else:
-        #     print("连接数据库成功")
+
 
         # 创建游标
         self.cur = self.db_conn.cursor()
@@ -84,43 +84,11 @@ class ConnSql(object):
         """
         pass
 
-    def insert_user(self,uid,uname,upwd):
+    def create_add_fir_tb(self):
         """
-            创建用户
+            创建添加好友数据库
         """
-        sql = "insert into user (uid ,uname,upwd) values ('%s','%s')"%(uid,uname,upwd)
-        try:
-            self.cur.execute(sql)
-            self.db_conn.commit()
-            return True
-        except:
-            self.db_conn.rollback()
-            return False
-
-        
-    def query_user_by_name(self,uid):
-        """
-            查询用户表
-        """
-        sql = "select * from user where uid = '%s'"%uid
-        self.cur.execute(sql)
-        r = self.cur.fetchone()
-        if r != None:
-            return False
-        else:
-            return True
-
-    def verify_login(self,uid,upwd):
-        """
-            验证用户登录
-        """
-        sql = "select * from user where uid = '%s' and upwd = '%s'" %(uid,upwd)
-        self.cur.execute(sql)
-        r = self.cur.fetchone()
-        if r != None:
-            return True
-        else:
-            return False
+        pass
 
 
 
@@ -128,7 +96,7 @@ class ConnSql(object):
 
 
 if __name__ == '__main__':
-    db = ConnSql()
+    db = MySql()
     db.sql_init()
     
 

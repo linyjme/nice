@@ -7,6 +7,9 @@
 SERVER_IP = "0.0.0.0"
 PORT = 8888
 
+# [debug]
+DEBUG = True
+
 # 数据库参数
 class DbConf:
     def __init__(self):

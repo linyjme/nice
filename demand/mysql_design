@@ -8,6 +8,10 @@
         用户账号:uid
         用户名:uname
         用户密码:upwd
+    
+    好友列表：
+            friends
+        
 
     历史记录表：
             chat_history

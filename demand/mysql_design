@@ -24,11 +24,6 @@
         消息msg:
         日期data:
 
-    加好友：
-            friends
-        从本人id：
-        从好友id：
-        是否同意添加：
 
     聊天室:
             rooms

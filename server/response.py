@@ -6,21 +6,27 @@ from server_tool import *
 from sql_tool import *
 
 
+
+# 在线用户
+# 键：用户账号
+# 值：用户addr
+online_user = {}
+
 class Response(object):
     """
         处理客户端响应
     """
     def __init__(self):
         
-        # 建立数据库调用对象
+        # 建立数据库对象调用方法
         self.sql = Sql_tool()
 
-        # 创建服务端方法调用对象
+        # 创建服务端对象调用方法
         self.tool = Servertool()
 
 
 
-    def do_login(self,c,request,addr):
+    def do_login(self,c,request):
         """
             处理客户登录
             1.接收客户信息，解析
@@ -30,7 +36,7 @@ class Response(object):
         """
         uid  = request['uid']
         upwd = request['upwd']
-        uaddr = request['addr']
+        # uaddr = request['addr']
         # 验证客户账号跟密码是否正确
         res = self.sql.verify_login(uid,upwd)
         if res == False:
@@ -39,13 +45,12 @@ class Response(object):
         user_status = self.tool.query_user_status(uid)
         if user_status == True:
         # 表示远程有登录,剔除远程的下线
-            self.tool.get_rid_repeat_users(c,uid,addr)
+            self.tool.get_rid_repeat_users(uid)
         c.send(b'OK')
-        self.tool.record_user_status(uid,addr)
-        
+        self.tool.record_user_status(uid,c)
         
 
-    def do_register(self,c,request,addr):
+    def do_register(self,c,request):
         """
             处理用户注册
             1.接收客户请求
@@ -64,10 +69,10 @@ class Response(object):
         else:
             c.send("账号已存在".encode())
 
-    def do_do_joinfriend(self,c,request,addr):
+    def do_joinfriend(self,c,request):
         """
             处理用户添加好友请求
-            1.判断好友是否存在
+            1.判断好友账号是否存在
             2.已经是好友
             3.已经发送过好友请求
             4.将用户添加的好友信息暂存到添加好友数据库中
@@ -77,39 +82,48 @@ class Response(object):
         res = self.sql.query_user_by_name(fuid)
         if res == True:
             c.send(b'OK')
-            # 将用户添加好友的信息存储
+            # 处理用户好友信息添加的请求
+            self.tool.send_add_fri_require(uid,fuid)
         else:
             c.send("用户不存在".encode())
 
 
-    def do_update_state(self,c,request,addr):
+    def do_update_state(self,c,request):
         """
-            处理客户刷新请求
+            处理用户刷新请求
             1.接收用户刷新请求
             2.获取被添加好友的信息
             3.获取好友列表(在线好友与非在线好友)
             4.将2,3信息回发给客户端
         """
-        pass
-    
-    def do_joinfriend(self,c,request,addr):
-        """
-            加好友的功能
-        """
-        fuid = request['fuid']
         uid = request['uid']
-        # 查询好友关系
+        fri_re = self.tool.get_add_fri_require(uid)
+        fri_re_list = []
+        if len(fri_re) != 0:
+            for k in fri_re:
+                re = self.sql.query_uname_by_uid(k)
+                fri_re_list.append(re)
+        else:
+            pass
         
+        fri_list = self.sql.query_friens_by_uid(uid)
 
+    def do_friends_reply(self,c,request):
+        """
+            处理用户好友请求答复
+            如果用户同意，则将同意信息发送给另外一个用户(包括对方好友是否在线)
+                如果此时用户不在线，则将信息临时存储
+            同时存储两个好友到好友列表
+            如果不同意
+            回复给另外一个客户端
+        """
+        uid_re = request['re']
+        uid_01 = request['uid']
+        uid_02 = request['fuid']
+
+        if uid_re == "yes":
+            pass
 
 
 
         
-
-        
-        
-
-
-
-
-    

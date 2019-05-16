@@ -19,9 +19,10 @@ import json
 # 服务器地址
 ADDR = (SERVER_IP,PORT)
 
-
 # 处理僵尸进程
 signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+
+
 
 class Server(object):
 
@@ -30,10 +31,10 @@ class Server(object):
         self.create_socket()
         self.bind()
         # 运行main
+        self.server = MySql()
         self.main()
-        # 实例化响应对象
-        self.response = Response()
-        self.server_sql = MySql()
+        
+
 
     def create_socket(self):
         """
@@ -58,12 +59,16 @@ class Server(object):
             数据库初始化
         """
         # 数据库初始化
-        self.server_sql.sql_init()
+        # sql = MySql()
+        # sql.sql_init()
+        self.server.sql_init()
+
         self.sockfd.listen(5)
         print("Listen the port %d..."%self.port)
         while True:
             try:
                 c, addr = self.sockfd.accept()
+            
                 print("Connect from ", addr)
             except KeyboardInterrupt:
                 self.sockfd.close()
@@ -80,6 +85,10 @@ class Server(object):
                 sys.exit()
             else:
                 c.close()
+            # 使用多线程
+            # client = Thread(target= do_request,args=(c,addr))
+            # client.setDaemon(True)
+            # client.start()
 
 
 
@@ -92,6 +101,8 @@ def do_request(c,addr):
     re = Response()
     while True:
         data = c.recv(1024).decode()
+        print(data)
+        print("111111")
         request = json.loads(data)
         print(request)
         # 区分请求类型
@@ -101,16 +112,19 @@ def do_request(c,addr):
             return
         elif request['style'] == 'L':
             # 登录请求
-            re.do_login(c,request,addr)
+            re.do_login(c,request)
         elif request['style'] =='R':
             # 注册请求
-            re.do_register(c,request,addr)
+            re.do_register(c,request)
         elif request['style'] == 'S':
             # 登录后给客户端的初始化
-            re.do_update_state(c,request,addr)
+            re.do_update_state(c,request)
         elif request['style'] =='F':
             # 添加好友请求
-            re.do_joinfriend(c,request,addr)
+            re.do_joinfriend(c,request)
+        elif request['style'] =='D':
+            # 处理好友请求
+            re.do_friends_reply(c,request)
         elif request['style'] =='C':
             # 创建群聊房间
             re.do_create_romm(c,request,addr)
@@ -122,7 +136,7 @@ def do_request(c,addr):
             # 群聊
             re.do_group_chat(s,msgList[1],addr)
 
-        
+
         
 
 if __name__ == '__main__':

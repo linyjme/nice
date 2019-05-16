@@ -73,17 +73,35 @@ class Sql_tool():
             通过用户名查询所有好友
         """
         temp_list = []
-        sql = "select * from user where uid = '%s' " % uid
+        sql = "select  from user where uid = '%s' " % uid
         result = self.sql_tool.cur.execute(sql)
         print(result)
         if result == None:
-            return False
+            return []
         
-        for info in result:
-            temp_dict = {}
-            uid = info[1]
-            fuid = info[2]
-            temp_dict[uid] = fuid
-            temp_list.append(temp_dict)
-        return temp_list
+        # for info in result:
+        #     temp_dict = {}
+        #     uid = info[0]
+        #     fuid = info[1]
+        #     temp_dict[uid] = fuid
+        #     temp_list.append(temp_dict)
+        # return temp_list
+        # for info in result:
+            
+
+    def insert_friends(self,uid_01,uid_02):
+        """
+            插入好友信息表
+        """
+        pass
+
+
+    def query_uname_by_uid(self,uid):
+        """
+            通过查询账号获得昵称
+            返回好友昵称
+        """
+        sql = "select uname from user where uid = '%s' " % uid
+        result = self.sql_tool.cur.execute(sql)
+        return result
 

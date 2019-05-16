@@ -11,7 +11,7 @@ PORT = 8888
 DEBUG = True
 
 # 数据库参数
-class DbConf:
+class DbConf(object):
     def __init__(self):
         self.host = "localhost"  # 服务器地址127.0.0.1
         self.user = "root"  # 连接数据库的用户名

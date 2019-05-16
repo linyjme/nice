@@ -9,8 +9,8 @@ from connfig import *
 
 """
     开始服务器后，先判断是否存在chat数据库,
-    如果存在，则创建表，如果表存在，则返回ok
-    如果chat数据库不存在，则创建chat数据库，然后建立表
+    如果存在，则提示自行检查数据库的所有表是否ok
+    如果chat数据库不存在，则创建chat数据库，然后建立表,数据库的初始化
 
 """
 class MySql(object):
@@ -27,6 +27,7 @@ class MySql(object):
         re = self.create_chatdb()
         if re == True:
             self.create_user_tb()
+            self.create_firs_tb()
             # self.create_his_tb()
         else:
             print("存在数据库chat，请检查数据库是否正确")
@@ -49,7 +50,7 @@ class MySql(object):
 
         # 创建游标
         self.cur = self.db_conn.cursor()
-        return True
+        # return True
 
     def create_chatdb(self):
         """
@@ -75,8 +76,8 @@ class MySql(object):
         # 进入chat数据库
         self.cur.execute("use chat;")
         # print("进入数据库成功")
-        sql = """create table user (id int primary key auto_increment,uid varchar(32) not 
-        null ,uname varchar(32) not null,upwd varchar(32) not null);"""
+        sql = """create table if not exists user (uid varchar(32) primary key
+         ,uname varchar(64) not null,upwd varchar(32) not null);"""
         # 创建user表
         self.cur.execute(sql)
         print("创建user表成功")
@@ -86,24 +87,40 @@ class MySql(object):
         """
             创建历史记录
         """
+        pass
         
 
     def create_firs_tb(self):
         """
             创建添加好友数据库
             好友表
-            编号:id
-            主用户:uid
-            好友:ufid
+            主用户:user_id1
+            好友:user_id2
         """
-        sql = """create table friends (id int auto_increment ,uid varchar(32) primary key
-        ,ufid varchar(32) not null;
+        sql = """create table if not exists friends ( user_id1 varchar(32) not null,
+        user_id2 varchar(32) not null,primary key (user_id1,user_id2));
         """
         # 创建friends表
         self.cur.execute(sql)
         print("创建friends表成功")
         return True
 
+
+
+# /* 用户表 */
+# CREATE TABLE IF NOT EXISTS users (
+#     user_id varchar(80) not null,   	 /* 用户Id  */
+#     user_pwd varchar(25)  not null,	 /* 用户密码 */
+#     user_name varchar(80) not null,  	 /* 用户名 */
+#     user_icon varchar(100) not null, 	 /* 用户头像 */
+# PRIMARY KEY (user_id));
+
+
+# /* 用户好友表Id1和Id2互为好友 */
+# CREATE TABLE IF NOT EXISTS friends (
+#     user_id1 varchar(80) not null,   	 /* 用户Id1  */
+#     user_id2 varchar(80) not null,   	 /* 用户Id2  */
+# PRIMARY KEY (user_id1, user_id2));
         
 
 

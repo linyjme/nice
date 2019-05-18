@@ -4,7 +4,7 @@
 
 import pymysql
 import sys
-from connfig import *
+from config import *
 
 
 """
@@ -16,41 +16,39 @@ from connfig import *
 class MySql(object):
     def __init__(self):
         self.db_conf = DbConf()
+        # 创建数据库连接对象
+        self.db_conn = self.open_conn()
+        # 创建游标
+        self.cur = self.db_conn.cursor()
 
 
-    # @staticmethod
     def sql_init(self):
         """
             初始化数据库
         """
-        self.open_conn()
         re = self.create_chatdb()
         if re == True:
             self.create_user_tb()
             self.create_firs_tb()
             # self.create_his_tb()
         else:
-            print("存在数据库chat，请检查数据库是否正确")
+            print("数据库chat已存在，请自行检查")
             
 
     def open_conn(self):
         """
             连接数据库
-        :return:
         """
         try:
             # 建立连接对象
-            self.db_conn = pymysql.connect(self.db_conf.host, self.db_conf.user, self.db_conf.passwd,
+            conn = pymysql.connect(self.db_conf.host, self.db_conf.user, self.db_conf.passwd,
                                            charset='utf8')
         except Exception as e:
             print("连接数据库错误")
             print(e)
             sys.exit("数据库连接失败，程序退出")
+        return conn
 
-
-        # 创建游标
-        self.cur = self.db_conn.cursor()
-        # return True
 
     def create_chatdb(self):
         """
@@ -105,23 +103,6 @@ class MySql(object):
         print("创建friends表成功")
         return True
 
-
-
-# /* 用户表 */
-# CREATE TABLE IF NOT EXISTS users (
-#     user_id varchar(80) not null,   	 /* 用户Id  */
-#     user_pwd varchar(25)  not null,	 /* 用户密码 */
-#     user_name varchar(80) not null,  	 /* 用户名 */
-#     user_icon varchar(100) not null, 	 /* 用户头像 */
-# PRIMARY KEY (user_id));
-
-
-# /* 用户好友表Id1和Id2互为好友 */
-# CREATE TABLE IF NOT EXISTS friends (
-#     user_id1 varchar(80) not null,   	 /* 用户Id1  */
-#     user_id2 varchar(80) not null,   	 /* 用户Id2  */
-# PRIMARY KEY (user_id1, user_id2));
-        
 
 
 

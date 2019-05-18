@@ -4,6 +4,7 @@
 
 from server_tool import *
 from sql_tool import *
+import json
 
 
 
@@ -24,6 +25,18 @@ class Response(object):
         # 创建服务端对象调用方法
         self.tool = Servertool()
 
+    def do_user_exit(self,c):
+        """
+            处理用户退出
+            删除用户在线状态
+            将用户离线信息发送给好友
+        """
+        uid = self.tool.del_user_status_by_c(c)
+        if uid != False:
+            # 通知好友用户离线信息
+            self.tool.send_user_status_to_friend(uid,'O')
+            c.close()
+            return True
 
 
     def do_login(self,c,request):
@@ -42,12 +55,16 @@ class Response(object):
         if res == False:
             c.send('账号或密码有误'.encode())
             return
-        user_status = self.tool.query_user_status(uid)
+        user_status = self.tool.get_online_status_by_uid(uid)
+        # print("登录状态",user_status)
         if user_status == True:
         # 表示远程有登录,剔除远程的下线
             self.tool.get_rid_repeat_users(uid)
         c.send(b'OK')
         self.tool.record_user_status(uid,c)
+
+        # 用户上线消息通州给用户好友
+        self.tool.send_user_status_to_friend(uid,'')
         
 
     def do_register(self,c,request):
@@ -59,13 +76,14 @@ class Response(object):
         """
         uid = request["uid"]
         # 验证用户名是否存在
-        res = self.sql.query_user_by_name(uid)
+        # res = self.sql.query_user_by_name(uid)
+        res = self.sql.query_user_by_uid(uid)
         if res == True:
             c.send(b'OK')
             uname = request['uname']
             upwd = request['upwd']
             # 创建用户信息
-            self.sql.insert_user(self,uid,uname,upwd)
+            self.sql.insert_user(uid,uname,upwd)
         else:
             c.send("账号已存在".encode())
 
@@ -79,7 +97,7 @@ class Response(object):
         """
         uid = request['uid']
         fuid = request['fuid']
-        res = self.sql.query_user_by_name(fuid)
+        res = self.sql.query_user_by_uid(fuid)
         if res == True:
             c.send(b'OK')
             # 处理用户好友信息添加的请求
@@ -88,25 +106,63 @@ class Response(object):
             c.send("用户不存在".encode())
 
 
-    def do_update_state(self,c,request):
+    def do_load_friend_list(self,c,request):
         """
             处理用户刷新请求
             1.接收用户刷新请求
-            2.获取被添加好友的信息
-            3.获取好友列表(在线好友与非在线好友)
-            4.将2,3信息回发给客户端
+            2.将用户的账号跟昵称打包
+            3.将用户好友账号跟昵称打包一并发给用户
+        """
+        # 发送好友列表给用户
+        client_fri_list = {}
+        uid = request['uid']
+        uname = self.sql.get_uname_by_uid(uid)
+        client_fri_list[uid] = uname
+        fri_list = self.sql.get_friens_list_by_uid(uid)
+        # fri_list : ["好友账号":"好友昵称"]
+        # fris_on_line : [在线好友]
+        if len(fri_list) == 0:
+            msg = json.dumps(client_fri_list)
+        else:
+            fri_dict = {}
+            for item in fri_list:
+                fname = self.sql.get_uname_by_uid(item)
+                fri_dict[item] = fname
+            client_fri_list["fri_list"] = fri_dict
+
+            fris_on_line = []
+            for item in fri_list:
+                result = self.tool.get_online_status_by_uid(item)
+                if result == True:
+                    fris_on_line.append(item)
+            client_fri_list["fris_on_line"] = fris_on_line
+            msg = json.dumps(client_fri_list)
+
+        c.send(msg.encode())
+
+    
+    def do_off_line_msg(self,c,request):
+        """
+            用户离线消息
+            离线的消息，离线好友请求
         """
         uid = request['uid']
-        fri_re = self.tool.get_add_fri_require(uid)
-        fri_re_list = []
-        if len(fri_re) != 0:
-            for k in fri_re:
-                re = self.sql.query_uname_by_uid(k)
-                fri_re_list.append(re)
+        # fir_add = {'style':'F'}
+        fir_add = {}
+        result = self.tool.get_add_fri_require(uid)
+        if result:
+            for item in result:
+                uname = self.sql.get_uname_by_uid(item)
+                fir_add[item] = uname
+            msg = json.dumps(fir_add)
+            # 删除临时存储加好友的请求
+            self.tool.del_add_fri_require(uid)
         else:
-            pass
-        
-        fri_list = self.sql.query_friens_by_uid(uid)
+            msg = json.dumps(fir_add)
+
+        c.send(msg.encode())
+
+
 
     def do_friends_reply(self,c,request):
         """
@@ -120,9 +176,35 @@ class Response(object):
         uid_re = request['re']
         uid_01 = request['uid']
         uid_02 = request['fuid']
-
+        msg = {'style':'D'}
+        # 获得好友昵称
+        uname = self.sql.get_uname_by_uid(uid_01)
+        msg[uid_01] = uname
+        c = get_conn_by_uid(uid_02)
         if uid_re == "yes":
-            pass
+            msg["re"] = 'yes'
+            # 存储好友关系到数据库
+            self.sql.insert_friends(uid_01,uid_02)
+            # 获得用户是否在线
+            re = self.tool.get_online_status_by_uid(uid_02)
+            if re  == True:
+                msg = json.dumps(msg)
+                c.send(msg.encode())
+                return
+            else:
+                pass
+                # 将信息存储
+        else:
+            msg["re"] = 'no'
+            msg = json.dumps(msg)
+            c.send(msg.encode())
+            
+
+            
+
+
+            
+
 
 
 

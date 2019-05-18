@@ -10,7 +10,7 @@ import pymysql
 import signal
 from multiprocessing import Process 
 from threading import Thread
-from connfig import *
+from config import *
 from sql_db import *
 from response import *
 import json
@@ -31,7 +31,6 @@ class Server(object):
         self.create_socket()
         self.bind()
         # 运行main
-        self.server = MySql()
         self.main()
         
 
@@ -59,10 +58,8 @@ class Server(object):
             数据库初始化
         """
         # 数据库初始化
-        # sql = MySql()
-        # sql.sql_init()
-        self.server.sql_init()
-
+        sql = MySql()
+        sql.sql_init()
         self.sockfd.listen(5)
         print("Listen the port %d..."%self.port)
         while True:
@@ -85,11 +82,6 @@ class Server(object):
                 sys.exit()
             else:
                 c.close()
-            # 使用多线程
-            # client = Thread(target= do_request,args=(c,addr))
-            # client.setDaemon(True)
-            # client.start()
-
 
 
 
@@ -101,14 +93,14 @@ def do_request(c,addr):
     re = Response()
     while True:
         data = c.recv(1024).decode()
-        print(data)
-        print("111111")
+        if not data:
+            re.do_user_exit(c)
+            return
         request = json.loads(data)
-        print(request)
         # 区分请求类型
         if request['style'] == 'Q':
             # 处理用户退出
-            c.close()
+            re.do_user_exit(c)
             return
         elif request['style'] == 'L':
             # 登录请求
@@ -118,7 +110,10 @@ def do_request(c,addr):
             re.do_register(c,request)
         elif request['style'] == 'S':
             # 登录后给客户端的初始化
-            re.do_update_state(c,request)
+            re.do_load_friend_list(c,request)
+        elif request['style'] == 'A':
+            # 处理登录后的离线消息跟加好友的消息
+            re.do_off_line_msg(c,request)
         elif request['style'] =='F':
             # 添加好友请求
             re.do_joinfriend(c,request)
@@ -128,11 +123,10 @@ def do_request(c,addr):
         elif request['style'] =='C':
             # 创建群聊房间
             re.do_create_romm(c,request,addr)
-        elif request['style'] == 'M':
+        elif request['style'] == 'N':
             # 私聊
             re.do_priv_chat(c,request,addr)
-
-        elif request['style'] == 'N':
+        elif request['style'] == 'M':
             # 群聊
             re.do_group_chat(s,msgList[1],addr)
 

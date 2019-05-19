@@ -18,4 +18,18 @@ class DbConf(object):
         self.passwd = "123456"  # 密码
         self.dbname = "chat"  # 连接哪一个库
 
+
+# 存储临时加好友的信息 被添加方账号为键,主动方账号为值
+# def _init():
+#     global dict_fri
+#     dict_fri = {}
+
+# def set_value(name, value):
+#     dict_fri[name] = value
+
+# def get_value():
+#     try:
+#         return dict_fri
+#     except KeyError:
+#         return defValue
         

@@ -7,16 +7,17 @@ import json
 from sql_db import *
 from sql_tool import *
 from response import *
-
-
-# 存储连接套接字与账号,账号为键，套接字为值
-dict_conn = {}
-
+# from server_main import *
+# import config as gl
 
 # 存储临时加好友的信息 被添加方账号为键,主动方账号为值
 dict_fri = {}
 
+# 存储连接套接字与账号,账号为键，套接字为值
+dict_conn = {}
+
 # 存储临时确认好友信息
+
 
 
 def get_conn_by_uid(uid):
@@ -87,6 +88,7 @@ class Servertool(object):
         else:
             dict_fri[fuid] = uid
 
+
     
     def get_add_fri_require(self,uid):
         """
@@ -103,9 +105,9 @@ class Servertool(object):
         """
             删除零时存放的用户加好友请求
         """
-        for item in dict_fri:
-            if uid == item:
-                del dict_fri[item]
+        for key in list(dict_fri):
+            if key == uid:
+                del dict_fri[key]
 
 
     def del_user_status_by_c(self,c):
@@ -113,11 +115,17 @@ class Servertool(object):
             通过连接套接字删除用户在线状态
             如果删除成功，则返回用户账号
         """
-        for uid in dict_conn:
-            if c == dict_conn[uid]:
-                # dict_conn.pop(uid)
-                del dict_conn[uid]
-                return uid
+        # for uid in dict_conn:
+        #     if c == dict_conn[uid]:
+        #         # dict_conn.pop(uid)
+        #         del dict_conn[uid]
+        #         return uid
+        # else:
+        #     return False
+        for key in list(dict_conn):
+            if c == dict_conn[key]:
+                del dict_conn[key]
+                return key
         else:
             return False
 
@@ -126,6 +134,8 @@ class Servertool(object):
         """
             用户上线或离线，将用户状态发送给好友
             获取用户的在线好友
+            上线status O 
+            离线status Q
         """
         # 通过用户uid查询好友
         fri_list = self.ser_tool.get_friens_list_by_uid(uid)

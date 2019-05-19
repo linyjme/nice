@@ -110,6 +110,7 @@ class Sql_tool():
 
 if __name__ == "__main__":
     re = Sql_tool()
+    re.insert_friends('13750050640','13750050642')
     # print(result)
     # result = re.verify_login("12311111111","123456")
     # print(result)

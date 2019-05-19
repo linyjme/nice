@@ -22,7 +22,8 @@ ADDR = (SERVER_IP,PORT)
 # 处理僵尸进程
 signal.signal(signal.SIGCHLD, signal.SIG_IGN)
 
-
+# 初始化全局变量
+# gl._init()
 
 class Server(object):
 
@@ -33,7 +34,6 @@ class Server(object):
         # 运行main
         self.main()
         
-
 
     def create_socket(self):
         """
@@ -64,8 +64,7 @@ class Server(object):
         print("Listen the port %d..."%self.port)
         while True:
             try:
-                c, addr = self.sockfd.accept()
-            
+                c, addr = self.sockfd.accept()    
                 print("Connect from ", addr)
             except KeyboardInterrupt:
                 self.sockfd.close()
@@ -74,15 +73,18 @@ class Server(object):
                 print(e)
                 continue
             # 创建子进程
-            pid = os.fork()
-            if pid == 0:
-                self.sockfd.close()
-                # 处理客户端请求
-                do_request(c,addr)
-                sys.exit()
-            else:
-                c.close()
-
+            # pid = os.fork()
+            # if pid == 0:
+            #     self.sockfd.close()
+            #     # 处理客户端请求
+            #     do_request(c,addr)
+            #     sys.exit()
+            # else:
+            #     c.close()
+            # 使用多线程
+            client = Thread(target= do_request,args=(c,addr))
+            client.setDaemon(True)
+            client.start()
 
 
 def do_request(c,addr):
@@ -122,13 +124,13 @@ def do_request(c,addr):
             re.do_friends_reply(c,request)
         elif request['style'] =='C':
             # 创建群聊房间
-            re.do_create_romm(c,request,addr)
+            re.do_create_romm(c,request)
         elif request['style'] == 'N':
             # 私聊
-            re.do_priv_chat(c,request,addr)
+            re.do_priv_chat(c,request)
         elif request['style'] == 'M':
             # 群聊
-            re.do_group_chat(s,msgList[1],addr)
+            re.do_group_chat(c,request)
 
 
         

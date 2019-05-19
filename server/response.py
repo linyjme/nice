@@ -7,12 +7,6 @@ from sql_tool import *
 import json
 
 
-
-# 在线用户
-# 键：用户账号
-# 值：用户addr
-online_user = {}
-
 class Response(object):
     """
         处理客户端响应
@@ -34,7 +28,7 @@ class Response(object):
         uid = self.tool.del_user_status_by_c(c)
         if uid != False:
             # 通知好友用户离线信息
-            self.tool.send_user_status_to_friend(uid,'O')
+            self.tool.send_user_status_to_friend(uid,'Q')
             c.close()
             return True
 
@@ -63,8 +57,8 @@ class Response(object):
         c.send(b'OK')
         self.tool.record_user_status(uid,c)
 
-        # 用户上线消息通州给用户好友
-        self.tool.send_user_status_to_friend(uid,'')
+        # 用户上线消息通知给用户好友
+        self.tool.send_user_status_to_friend(uid,'O')
         
 
     def do_register(self,c,request):
@@ -98,7 +92,7 @@ class Response(object):
         uid = request['uid']
         fuid = request['fuid']
         res = self.sql.query_user_by_uid(fuid)
-        if res == True:
+        if res == False:
             c.send(b'OK')
             # 处理用户好友信息添加的请求
             self.tool.send_add_fri_require(uid,fuid)
@@ -198,6 +192,12 @@ class Response(object):
             msg["re"] = 'no'
             msg = json.dumps(msg)
             c.send(msg.encode())
+
+
+    def do_priv_chat(self,c,request):
+        uid  = request['uid']
+        fuid = request['fuid']
+        msg = request['msg']
             
 
             

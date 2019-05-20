@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-from login_register import *
+from client_tool import *
 import tkinter.messagebox
 from tkinter import scrolledtext
 import time
@@ -107,21 +107,10 @@ class Application:
 
             a = self.q.register(user, passsword1, passsword2, name)
             self.messagebox(a)
-            # data = register(user, passsword1, passsword2, name)
-            # if data == "OK":
-            #     self.messagebox("注册成功，请返回登录")
-            #     self.list0[0].destroy()
-            # else:
-            #     self.messagebox(data)
-        # if passsword2 == None:
-        #     # 登录成功
-        #     self.login_successfully()
-        # if passsword2 != None:
-        #     # 注册成功
-        #     self.registered_successfully()
 
     def messagebox(self,msg):  # 弹窗提示
         tkinter.messagebox.showinfo(title='提示', message=msg)
+
     def login_successfully(self,data):
         # 登录成功
         Message(self.root, text='登录成功，正在跳转，请稍候...', ).place(x=10, y=130)

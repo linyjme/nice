@@ -49,11 +49,11 @@ class Response(object):
         if res == False:
             c.send('账号或密码有误'.encode())
             return
-        user_status = self.tool.get_online_status_by_uid(uid)
+        uid_c = self.tool.get_online_status_by_uid(uid)
         # print("登录状态",user_status)
-        if user_status == True:
+        if uid_c != False:
         # 表示远程有登录,剔除远程的下线
-            self.tool.get_rid_repeat_users(uid)
+            self.tool.get_rid_repeat_users(uid,uid_c)
         c.send(b'OK')
         self.tool.record_user_status(uid,c)
 
@@ -127,7 +127,7 @@ class Response(object):
             fris_on_line = []
             for item in fri_list:
                 result = self.tool.get_online_status_by_uid(item)
-                if result == True:
+                if result != False:
                     fris_on_line.append(item)
             client_fri_list["fris_on_line"] = fris_on_line
             msg = json.dumps(client_fri_list)
@@ -141,6 +141,7 @@ class Response(object):
             离线的消息，离线好友请求
         """
         uid = request['uid']
+
         # fir_add = {'style':'F'}
         fir_add = {}
         result = self.tool.get_add_fri_require(uid)
@@ -174,30 +175,42 @@ class Response(object):
         # 获得好友昵称
         uname = self.sql.get_uname_by_uid(uid_01)
         msg[uid_01] = uname
-        c = get_conn_by_uid(uid_02)
         if uid_re == "yes":
             msg["re"] = 'yes'
             # 存储好友关系到数据库
             self.sql.insert_friends(uid_01,uid_02)
             # 获得用户是否在线
-            re = self.tool.get_online_status_by_uid(uid_02)
-            if re  == True:
+            fuid_c = self.tool.get_online_status_by_uid(uid_02)
+            if fuid_c != False:
                 msg = json.dumps(msg)
-                c.send(msg.encode())
+                fuid_c.send(msg.encode())
                 return
             else:
                 pass
                 # 将信息存储
+                # {'fri_pass':[]}
         else:
-            msg["re"] = 'no'
-            msg = json.dumps(msg)
-            c.send(msg.encode())
+            fuid_c = self.tool.get_online_status_by_uid(uid_02)
+            if fuid_c != False:
+                msg["re"] = 'no'
+                msg = json.dumps(msg)
+                fuid_c.send(msg.encode())
+                return
+            else:
+                pass
 
 
     def do_priv_chat(self,c,request):
         uid  = request['uid']
         fuid = request['fuid']
         msg = request['msg']
+        # 查看好友是否在线
+        fuid_c = self.tool.get_online_status_by_uid(fuid)
+        if fuid_c != True:
+            msg = json.dumps(request)
+            fuid_c.send(msg.encode())
+        else:
+            pass
             
 
             

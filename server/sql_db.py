@@ -86,6 +86,11 @@ class MySql(object):
             创建历史记录
         """
         pass
+
+    def add_fris_tb(self):
+        """
+            加好友的请求表
+        """
         
 
     def create_firs_tb(self):

@@ -10,7 +10,7 @@ from config import *
 import sys
 import re
 import json
-# import gevent
+import gevent
 import time
 
 
@@ -142,10 +142,47 @@ class ClientManager():
             return None
         return msg
 
+    def get_off_msg(self,uid):
+        data = {"style":"A", "uid":uid}
+        request = json.dumps(data).encode()
+        self.clientor.send(request)
+        time.sleep(0.1)
+        msg = json.loads(self.clientor.recv(2048).decode())
+        if not msg:
+            return None
+        return msg
+
+    def add_friens(self,uid,fuid):
+        data = {"style":"F", "uid":uid,"fuid":fuid}
+        request = json.dumps(data).encode()
+        self.clientor.send(request)
+        time.sleep(0.1)
+        msg = self.clientor.recv(2048).decode()
+        if not msg:
+            return None
+        return msg
+
 #
 if __name__ == '__main__':
     user = ClientManager()
-    user.register("12311111111", "123456", "123456", "123")
+
+    # user.login("13750050640", "123456" )
+    # # # user.register('13750050642','123456','123456','lili')
+    # # msg = user.get_friends('13750050640')
+    # # print(msg)
+    # msg01 = user.add_friens('13750050640','13750050642')
+    # print(msg01)
+
+
+
+
+    # user.login("13750050642", "123456" )
+    # # # user.register('13750050642','123456','123456','lili')
+    # # msg = user.get_friends('13750050641')
+    # # print(msg)
+    # # msg01 = user.add_friens('13750050640','13750050641')
+    # msg01 = user.get_off_msg('13750050642')
+    # print(msg01)
 
 
 

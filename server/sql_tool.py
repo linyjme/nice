@@ -55,7 +55,6 @@ class Sql_tool():
             self.sql_tool.db_conn.rollback()
             return False
 
-        
 
     def insert_friends(self,uid,fuid):
         """
@@ -91,8 +90,6 @@ class Sql_tool():
         # 此时temp_list 为用户所有好友的账号
         return temp_list
 
-
-            
 
     def get_uname_by_uid(self,uid):
         """

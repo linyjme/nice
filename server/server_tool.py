@@ -17,7 +17,7 @@ dict_fri = {}
 dict_conn = {}
 
 # 存储临时确认好友信息
-
+dict_msg = {}
 
 
 def get_conn_by_uid(uid):
@@ -44,8 +44,6 @@ class Servertool(object):
         """
         dict_conn[uid] = c
 
-
-
     def get_online_status_by_uid(self,uid):
         """
             通过用户账号获取在线状态
@@ -53,21 +51,19 @@ class Servertool(object):
         """
         for i in dict_conn:
             if i == uid:
-                return True
+                return dict_conn[i]
         else:
             return False
 
-    def get_rid_repeat_users(self,uid):
+    def get_rid_repeat_users(self,uid,c):
         """
             踢掉用户
             待测试
         """
-        c = get_conn_by_uid(uid)
         msg = "账号在别处登录，被迫下线"
         c.send(msg.encode())
         # 关闭套接字
         c.close()
-
 
     def send_add_fri_require(self,uid,fuid):
         """
@@ -87,7 +83,6 @@ class Servertool(object):
         # 否则零时存储好友请求   
         else:
             dict_fri[fuid] = uid
-
 
     
     def get_add_fri_require(self,uid):
@@ -134,7 +129,7 @@ class Servertool(object):
         """
             用户上线或离线，将用户状态发送给好友
             获取用户的在线好友
-            上线status O 
+            上线status O
             离线status Q
         """
         # 通过用户uid查询好友

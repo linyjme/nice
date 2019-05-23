@@ -69,8 +69,29 @@ class Sql_tool():
             self.sql_tool.db_conn.rollback()
             return False
 
+    def insert_chat_history(self,uid,fuid,msg,re):
+        """
+            查询历史记录
+        :param uid:
+        :param fuid:
+        :param msg:
+        :return:
+        """
+        # sql = "insert into chat_history (user_id1 ,user_id2 ,msg) values ('%s','%s','%s')" % (uid, fuid, msg)
+        print('进入')
+        sql = "insert into chat_history values ('%s','%s','%s',now(),'%s')" % (uid, fuid, msg,re)
+        try:
+            self.sql_tool.cur.execute(sql)
+            self.sql_tool.db_conn.commit()
+            return True
+        except Exception as e:
+            print(e)
+            self.sql_tool.db_conn.rollback()
+            return False
 
-    def get_friens_list_by_uid(self,uid):
+
+
+    def get_friends_list_by_uid(self,uid):
         """
             通过用户名查询所有好友
         """
@@ -90,6 +111,22 @@ class Sql_tool():
         # 此时temp_list 为用户所有好友的账号
         return temp_list
 
+    def query_is_friend(self,user_id1,user_id2):
+        """
+            查询是否是好友
+        """
+        sql = "select * from friends where user_id1 = '%s' and user_id2 = '%s'" % (user_id1,user_id2)
+        result01 = self.sql_tool.cur.execute(sql)
+        result01 = self.sql_tool.cur.fetchone()
+        sql = "select * from friends where user_id2 = '%s' and user_id1 = '%s'" % (user_id2,user_id1)
+        result02 = self.sql_tool.cur.execute(sql)
+        result02 = self.sql_tool.cur.fetchone()
+        if result01 or result02:
+            return False
+        else:
+            return True
+
+
 
     def get_uname_by_uid(self,uid):
         """
@@ -107,7 +144,7 @@ class Sql_tool():
 
 if __name__ == "__main__":
     re = Sql_tool()
-    re.insert_friends('13750050640','13750050642')
+    # re.insert_friends('13750050640','13750050642')
     # print(result)
     # result = re.verify_login("12311111111","123456")
     # print(result)
@@ -119,7 +156,8 @@ if __name__ == "__main__":
     # result = re.query_friens_by_uid("12345678")
     # print(result)
     # print(type(result))
-
     # result = re.insert_user("12345678","456","45678")
     # print(result)
     # print(type(result))
+    result = re.insert_chat_history('1235','456','hah我是')
+    print(result)

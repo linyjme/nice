@@ -29,7 +29,6 @@ class Response(object):
         if uid != False:
             # 通知好友用户离线信息
             self.tool.send_user_status_to_friend(uid,'Q')
-            c.close()
             return True
 
 
@@ -91,13 +90,23 @@ class Response(object):
         """
         uid = request['uid']
         fuid = request['fuid']
+        msg = {'style':'B'}
+        result = self.sql.query_is_friend(uid,fuid)
+        if result:
+            # msg['re']='is' 已经是好友
+            msg['re']='is'
+            msg = json.dumps(msg)
+            c.send(msg.encode())
+            return
         res = self.sql.query_user_by_uid(fuid)
         if res == False:
-            c.send(b'OK')
+            msg['re']='yes'
             # 处理用户好友信息添加的请求
             self.tool.send_add_fri_require(uid,fuid)
         else:
-            c.send("用户不存在".encode())
+            msg['re'] = 'no'
+        msg = json.dumps(msg)
+        c.send(msg.encode())
 
 
     def do_load_friend_list(self,c,request):
@@ -111,18 +120,22 @@ class Response(object):
         client_fri_list = {}
         uid = request['uid']
         uname = self.sql.get_uname_by_uid(uid)
-        client_fri_list[uid] = uname
-        fri_list = self.sql.get_friens_list_by_uid(uid)
+        client_fri_list['uid'] = uid
+        client_fri_list['uname'] = uname
+
+        fri_list = self.sql.get_friends_list_by_uid(uid)
         # fri_list : ["好友账号":"好友昵称"]
         # fris_on_line : [在线好友]
         if len(fri_list) == 0:
             msg = json.dumps(client_fri_list)
         else:
-            fri_dict = {}
+            list_temp = []
             for item in fri_list:
+                fri_dict = {}
                 fname = self.sql.get_uname_by_uid(item)
                 fri_dict[item] = fname
-            client_fri_list["fri_list"] = fri_dict
+                list_temp.append(fri_dict)
+            client_fri_list["fri_list"] = list_temp
 
             fris_on_line = []
             for item in fri_list:
@@ -186,18 +199,19 @@ class Response(object):
                 fuid_c.send(msg.encode())
                 return
             else:
-                pass
                 # 将信息存储
-                # {'fri_pass':[]}
+                self.tool.save_add_fri_rep_msg(uid_02,msg)
+
         else:
+            msg["re"] = 'no'
             fuid_c = self.tool.get_online_status_by_uid(uid_02)
             if fuid_c != False:
-                msg["re"] = 'no'
                 msg = json.dumps(msg)
                 fuid_c.send(msg.encode())
                 return
             else:
-                pass
+                # 将信息存储
+                self.tool.save_add_fri_rep_msg(uid_02, msg)
 
 
     def do_priv_chat(self,c,request):
@@ -206,11 +220,33 @@ class Response(object):
         msg = request['msg']
         # 查看好友是否在线
         fuid_c = self.tool.get_online_status_by_uid(fuid)
-        if fuid_c != True:
+        # 将聊天信息写入到history
+        self.sql.insert_chat_history(uid,fuid,msg,'y')
+        if fuid_c != False:
             msg = json.dumps(request)
             fuid_c.send(msg.encode())
         else:
-            pass
+            self.sql.insert_chat_history(uid,fuid,msg,'n')
+
+
+    def do_create_romm(self,c, request):
+        """
+            创建群聊室
+        :param c:
+        :param request:
+        :return:
+        """
+        pass
+
+    def do_group_chat(self,c,request):
+        """
+            群聊消息
+        :param c:
+        :param request:
+        :return:
+        """
+        pass
+
             
 
             

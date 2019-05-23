@@ -30,7 +30,7 @@ class MySql(object):
         if re == True:
             self.create_user_tb()
             self.create_firs_tb()
-            # self.create_his_tb()
+            self.create_chat_history_tb()
         else:
             print("数据库chat已存在，请自行检查")
             
@@ -81,16 +81,25 @@ class MySql(object):
         print("创建user表成功")
         return True
 
-    def create_his_tb(self):
+    def create_chat_history_tb(self):
         """
-            创建历史记录
+            创建聊天历史记录表
         """
-        pass
+        # sql = """create table if not exists history (uid varchar(32) primary key,
+        #     fuid VARCHAR(32) not NULL ,msg VARCHAR (2048) not NULL);"""
+        sql = """create table if not exists chat_history (uid varchar(32) not NULL,
+        fuid VARCHAR(32) not NULL ,msg VARCHAR (2048) not NULL,times datetime not NULL,re enum('y','n'));"""
+        # 创建history表
+        self.cur.execute(sql)
+        print("创建chat history表成功")
+        return True
+
 
     def add_fris_tb(self):
         """
             加好友的请求表
         """
+        pass
         
 
     def create_firs_tb(self):
@@ -107,7 +116,6 @@ class MySql(object):
         self.cur.execute(sql)
         print("创建friends表成功")
         return True
-
 
 
 

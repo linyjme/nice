@@ -82,13 +82,9 @@
     客户端确认加好友后返回信息格式：
         {'style':'F',uid:'用户uid',fuid:'用户uid'，re:}
 
-    用户离线通知：{"status":'Q','uid':'uname'}
-    用户上线通知：{"status":'O','uid':'uname'}
+    用户离线通知：{"style":'Q','uid':'uname'}
+    用户上线通知：{"style":'O','uid':'uname'}
             
-            
-
-
-
 
         添加好友模块：
             需求：

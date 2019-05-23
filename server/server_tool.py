@@ -19,6 +19,10 @@ dict_conn = {}
 # 存储临时确认好友信息
 dict_msg = {}
 
+# 存储确认后的加好友信息　里面为字典,信息为键,值为需要服务端回发消息的账号uid
+list_Add = []
+
+
 
 def get_conn_by_uid(uid):
     """
@@ -104,25 +108,33 @@ class Servertool(object):
             if key == uid:
                 del dict_fri[key]
 
+    def save_add_fri_rep_msg(self,uid,msg):
+        """
+            存储加好友回复信息
+        :param uid:
+        :param msg:
+        :return:
+        """
+        dict_temp = {}
+        dict_temp[msg] = uid
+        # 将信息加入到零时存储
+        list_Add.append(dict_temp)
+
+
 
     def del_user_status_by_c(self,c):
         """
             通过连接套接字删除用户在线状态
             如果删除成功，则返回用户账号
         """
-        # for uid in dict_conn:
-        #     if c == dict_conn[uid]:
-        #         # dict_conn.pop(uid)
-        #         del dict_conn[uid]
-        #         return uid
-        # else:
-        #     return False
         for key in list(dict_conn):
             if c == dict_conn[key]:
                 del dict_conn[key]
+                c.close()
                 return key
         else:
             return False
+
 
     
     def send_user_status_to_friend(self,uid,status):
@@ -133,12 +145,12 @@ class Servertool(object):
             离线status Q
         """
         # 通过用户uid查询好友
-        fri_list = self.ser_tool.get_friens_list_by_uid(uid)
+        fri_list = self.ser_tool.get_friends_list_by_uid(uid)
         # print("fri_list",fri_list)
         if len(fri_list) == 0:
             # 没有好友，直接退出
             return
-        msg = {"status":status}
+        msg = {"style":status}
         uname = self.ser_tool.get_uname_by_uid(uid)
         msg[uid] = uname
         msg = json.dumps(msg)

@@ -14,7 +14,7 @@ import gevent
 import time
 
 
-class Client(object):
+class Socket(object):
     """
     创建应用端类
     """
@@ -28,7 +28,7 @@ class Client(object):
 
     def __connect(self):
         try:
-            self.sockfd.connect(("176.140.7.173",8888))
+            self.sockfd.connect((CLIENT_IP,PORT))
         except Exception:
             sys.exit("网络异常,请检查后启动")
 
@@ -46,7 +46,7 @@ class ClientManager():
     """
 
     def __init__(self):
-        self.clientor = Client()
+        # self.clientor = Socket()
         # self.clientor.start()
 
     def is_mobile(self, value):
@@ -81,7 +81,7 @@ class ClientManager():
             return False
         return True
 
-    def register(self,uid, upwd, upwd1, uname):
+    def register(self,uid, upwd, upwd1, uname,c):
         """
         注册方法,可以判定账号,密码,昵称格式,并将其发送给服务端,
         接收服务端返回信息进行判定下步操作
@@ -103,9 +103,9 @@ class ClientManager():
         data = {"style":"R", "uid":uid, "uname":uname, "upwd":upwd}
         print(data)
         request = json.dumps(data).encode()
-        self.clientor.send(request)
+        c.send(request)
         print("已发送")
-        data = self.clientor.recv(128).decode()
+        data = c.recv(128).decode()
         print(data)
         if data == "OK":
             # 注册结束后跳转登录界面还是直接进入交互界面
@@ -113,7 +113,7 @@ class ClientManager():
         else:
             return data
 
-    def login(self, uid, upwd):
+    def login(self, uid, upwd,c):
         if (" " in upwd) or (" " in uid):
             return False
         if not (self.is_mobile(uid) or self.is_email(uid)):
@@ -123,8 +123,8 @@ class ClientManager():
 
         data = {"style":"L", "uid":uid, "upwd":upwd}
         request = json.dumps(data).encode()
-        self.clientor.send(request)
-        msg = self.clientor.recv(128).decode()
+        c.send(request)
+        msg = c.recv(128).decode()
         if msg == "OK":
             # 此时应该跳转好友界面
             return True
@@ -132,32 +132,32 @@ class ClientManager():
             # 验证不通过,返回登录界面
             return False
 
-    def get_friends(self,uid):
+    def get_friends(self,uid,c):
         data = {"style":"S", "uid":uid}
         request = json.dumps(data).encode()
-        self.clientor.send(request)
+        c.send(request)
         time.sleep(0.1)
-        msg = json.loads(self.clientor.recv(2048).decode())
+        msg = json.loads(c.recv(2048).decode())
         if not msg:
             return None
         return msg
 
-    def get_off_msg(self,uid):
+    def get_off_msg(self,uid,c):
         data = {"style":"A", "uid":uid}
         request = json.dumps(data).encode()
-        self.clientor.send(request)
+        c.send(request)
         time.sleep(0.1)
-        msg = json.loads(self.clientor.recv(2048).decode())
+        msg = json.loads(c.recv(2048).decode())
         if not msg:
             return None
         return msg
 
-    def add_friens(self,uid,fuid):
+    def add_friens(self,uid,fuid,c):
         data = {"style":"F", "uid":uid,"fuid":fuid}
         request = json.dumps(data).encode()
-        self.clientor.send(request)
+        c.send(request)
         time.sleep(0.1)
-        msg = self.clientor.recv(2048).decode()
+        msg = c.recv(2048).decode()
         if not msg:
             return None
         return msg

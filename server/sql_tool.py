@@ -69,7 +69,7 @@ class Sql_tool():
             self.sql_tool.db_conn.rollback()
             return False
 
-    def insert_chat_history(self,uid,fuid,msg,re):
+    def insert_chat_history(self,uid,fuid,msg,times,re):
         """
             查询历史记录
         :param uid:
@@ -77,9 +77,7 @@ class Sql_tool():
         :param msg:
         :return:
         """
-        # sql = "insert into chat_history (user_id1 ,user_id2 ,msg) values ('%s','%s','%s')" % (uid, fuid, msg)
-        print('进入')
-        sql = "insert into chat_history values ('%s','%s','%s',now(),'%s')" % (uid, fuid, msg,re)
+        sql = "insert into chat_history values ('%s','%s','%s','%s','%s')" % (uid, fuid, msg,times,re)
         try:
             self.sql_tool.cur.execute(sql)
             self.sql_tool.db_conn.commit()
@@ -88,8 +86,6 @@ class Sql_tool():
             print(e)
             self.sql_tool.db_conn.rollback()
             return False
-
-
 
     def get_friends_list_by_uid(self,uid):
         """
@@ -125,7 +121,6 @@ class Sql_tool():
             return True
         else:
             return False
-
 
 
     def get_uname_by_uid(self,uid):

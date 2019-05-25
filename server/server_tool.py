@@ -16,12 +16,8 @@ dict_fri = {}
 # 存储连接套接字与账号,账号为键，套接字为值
 dict_conn = {}
 
-# 存储临时确认好友信息
-dict_msg = {}
-
 # 存储确认后的加好友信息　里面为字典,信息为键,值为需要服务端回发消息的账号uid
 list_Add = []
-
 
 
 def get_conn_by_uid(uid):
@@ -124,7 +120,6 @@ class Servertool(object):
         list_Add.append(dict_temp)
 
 
-
     def del_user_status_by_c(self,c):
         """
             通过连接套接字删除用户在线状态
@@ -137,7 +132,6 @@ class Servertool(object):
                 return key
         else:
             return False
-
 
     
     def send_user_status_to_friend(self,uid,status):

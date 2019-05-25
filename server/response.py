@@ -176,10 +176,9 @@ class Response(object):
         """
             处理用户好友请求答复
             如果用户同意，则将同意信息发送给另外一个用户(包括对方好友是否在线)
-                如果此时用户不在线，则将信息临时存储
+            如果此时用户不在线，则将信息临时存储
             同时存储两个好友到好友列表
-            如果不同意
-            回复给另外一个客户端
+            如果不同意,回复给另外一个客户端
         """
         uid_re = request['re']
         uid_01 = request['uid']
@@ -187,21 +186,32 @@ class Response(object):
         msg = {'style':'D'}
         # 获得好友昵称
         uname = self.sql.get_uname_by_uid(uid_01)
-        msg[uid_01] = uname
-        if uid_re == "yes":
+        msg['fuid'] = uid_01
+        msg['fname'] = uname
+        if uid_re == "yes": 
             msg["re"] = 'yes'
             # 存储好友关系到数据库
             self.sql.insert_friends(uid_01,uid_02)
             # 获得用户是否在线
             fuid_c = self.tool.get_online_status_by_uid(uid_02)
+            uid_02_uname = self.sql.get_uname_by_uid(uid_02)
+            uid_01_msg = {uid_02:uid_02_uname}
             if fuid_c != False:
+                uid_01_msg['style'] = 'O'
+                # 获得uid_01是否在线:
+                uid_01_status = self.tool.get_online_status_by_uid(uid_01)
+                if uid_01_status != False:
+                    msg['state'] = 'yes'
+                else:
+                    msg['state'] = 'no'
                 msg = json.dumps(msg)
                 fuid_c.send(msg.encode())
-                return
             else:
+                uid_01_msg['style'] = 'Q'
                 # 将信息存储
                 self.tool.save_add_fri_rep_msg(uid_02,msg)
-
+            uid_01_msg = json.dumps(uid_01_msg)
+            c.send(uid_01_msg.encode())
         else:
             msg["re"] = 'no'
             fuid_c = self.tool.get_online_status_by_uid(uid_02)
@@ -218,15 +228,16 @@ class Response(object):
         uid  = request['uid']
         fuid = request['fuid']
         msg = request['msg']
+        times = request['times']
         # 查看好友是否在线
         fuid_c = self.tool.get_online_status_by_uid(fuid)
-        # 将聊天信息写入到history
-        self.sql.insert_chat_history(uid,fuid,msg,'y')
         if fuid_c != False:
+            # 将聊天信息写入到history
+            self.sql.insert_chat_history(uid,fuid,msg,times,'y')
             msg = json.dumps(request)
             fuid_c.send(msg.encode())
         else:
-            self.sql.insert_chat_history(uid,fuid,msg,'n')
+            self.sql.insert_chat_history(uid,fuid,msg,times,'n')
 
 
     def do_create_romm(self,c, request):

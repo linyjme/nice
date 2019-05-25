@@ -21,7 +21,6 @@ class MySql(object):
         # 创建游标
         self.cur = self.db_conn.cursor()
 
-
     def sql_init(self):
         """
             初始化数据库
@@ -57,7 +56,7 @@ class MySql(object):
         try:
             self.cur.execute("create database chat default charset=utf8")
         except Exception as e:
-            print(e)
+            # print(e)
             return False
         else:
             print("创建chat成功")
@@ -88,7 +87,7 @@ class MySql(object):
         # sql = """create table if not exists history (uid varchar(32) primary key,
         #     fuid VARCHAR(32) not NULL ,msg VARCHAR (2048) not NULL);"""
         sql = """create table if not exists chat_history (uid varchar(32) not NULL,
-        fuid VARCHAR(32) not NULL ,msg VARCHAR (2048) not NULL,times datetime not NULL,re enum('y','n'));"""
+        fuid VARCHAR(32) not NULL ,msg VARCHAR (2048) not NULL,times VARCHAR(128) not NULL,re enum('y','n'));"""
         # 创建history表
         self.cur.execute(sql)
         print("创建chat history表成功")

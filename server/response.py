@@ -99,12 +99,12 @@ class Response(object):
             c.send(msg.encode())
             return
         res = self.sql.query_user_by_uid(fuid)
-        if res == False:
+        if res :
+            msg['re'] = 'no'
+        else:
             msg['re']='yes'
             # 处理用户好友信息添加的请求
             self.tool.send_add_fri_require(uid,fuid)
-        else:
-            msg['re'] = 'no'
         msg = json.dumps(msg)
         c.send(msg.encode())
 

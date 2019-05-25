@@ -64,7 +64,9 @@ class Servertool(object):
             踢掉用户
             待测试
         """
-        msg = "账号在别处登录，被迫下线"
+        msg = {'style':'E'}
+        msg['warm'] = "账号在别处登录，被迫下线"
+        msg = json.dumps(msg)
         c.send(msg.encode())
         # 关闭套接字
         c.close()
@@ -82,6 +84,7 @@ class Servertool(object):
                 msg = {'style':'F'}
                 client_uname = self.ser_tool.get_uname_by_uid(uid)
                 msg[uid] = client_uname
+                msg = json.dumps(msg)
                 c.send(msg.encode())
                 return
         # 否则零时存储好友请求   

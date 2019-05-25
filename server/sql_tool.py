@@ -115,16 +115,16 @@ class Sql_tool():
         """
             查询是否是好友
         """
-        sql = "select * from friends where user_id1 = '%s' and user_id2 = '%s'" % (user_id1,user_id2)
-        result01 = self.sql_tool.cur.execute(sql)
+        sql01 = "select * from friends where user_id1 = '%s' and user_id2 = '%s'" % (user_id1,user_id2)
+        result01 = self.sql_tool.cur.execute(sql01)
         result01 = self.sql_tool.cur.fetchone()
-        sql = "select * from friends where user_id2 = '%s' and user_id1 = '%s'" % (user_id2,user_id1)
-        result02 = self.sql_tool.cur.execute(sql)
+        sql02 = "select * from friends where user_id2 = '%s' and user_id1 = '%s'" % (user_id1,user_id2)
+        result02 = self.sql_tool.cur.execute(sql02)
         result02 = self.sql_tool.cur.fetchone()
         if result01 or result02:
-            return False
-        else:
             return True
+        else:
+            return False
 
 
 
@@ -159,5 +159,6 @@ if __name__ == "__main__":
     # result = re.insert_user("12345678","456","45678")
     # print(result)
     # print(type(result))
-    result = re.insert_chat_history('1235','456','hah我是')
+    # result = re.insert_chat_history('1235','456','hah我是')
+    result = re.query_is_friend('12369874105','12345678910')
     print(result)

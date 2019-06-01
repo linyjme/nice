@@ -30,6 +30,8 @@ class MySql(object):
             self.create_user_tb()
             self.create_firs_tb()
             self.create_chat_history_tb()
+            self.create_group_room()
+            self.create_room_user()
         else:
             print("数据库chat已存在，请自行检查")
             
@@ -78,7 +80,6 @@ class MySql(object):
         # 创建user表
         self.cur.execute(sql)
         print("创建user表成功")
-        return True
 
     def create_chat_history_tb(self):
         """
@@ -91,15 +92,33 @@ class MySql(object):
         # 创建history表
         self.cur.execute(sql)
         print("创建chat history表成功")
-        return True
 
 
-    def add_fris_tb(self):
+    def create_group_room(self):
         """
-            加好友的请求表
+            创建群聊表
+            rooms ：群id
+            uid :　创建的用户id
+            room_name：群名字
         """
-        pass
-        
+        sql = """create table if not exists rooms (room_id varchar(32) primary key,uid varchar(32) not NULL,room_name varchar(64) not null);"""
+        self.cur.execute(sql)
+        print("创建rooms表成功")
+
+
+    def create_room_user(self):
+        """"
+            创建群使用着
+            id:主键,自增
+            room_id :　群的id
+            room_user:群成员uid
+
+        """
+        sql = """create table if not exists room_user (id INT auto_increment  primary key 
+                         ,room_id varchar(32) not NULL,room_user varchar(32) not null);"""
+        self.cur.execute(sql)
+        print("创建room_user表成功")
+
 
     def create_firs_tb(self):
         """
@@ -114,10 +133,6 @@ class MySql(object):
         # 创建friends表
         self.cur.execute(sql)
         print("创建friends表成功")
-        return True
-
-
-
 
 
 

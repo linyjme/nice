@@ -7,8 +7,7 @@ import json
 from sql_db import *
 from sql_tool import *
 from response import *
-# from server_main import *
-# import config as gl
+
 
 # 存储临时加好友的信息 被添加方账号为键,主动方账号为值
 dict_fri = {}
@@ -157,6 +156,26 @@ class Servertool(object):
                 c = dict_conn[on_uid]
                 # 将用户状态消息发送给好友
                 c.send(msg.encode())
+
+    def send_rooms_msg(self,uid,msg,room_user):
+        """
+            发送群消息
+        :param uid:
+        :param msg:
+        :param room_user:
+        :return:
+        """
+        for kid in room_user:
+            if kid != uid and kid in dict_conn:
+                c = get_conn_by_uid(uid)
+                msg = json.dumps(msg)
+                c.send(msg.encode())
+            else:
+                # 将信息临时缓存
+                pass
+
+
+
 
 
 

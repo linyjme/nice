@@ -240,30 +240,77 @@ class Response(object):
             self.sql.insert_chat_history(uid,fuid,msg,times,'n')
 
 
-    def do_create_romm(self,c, request):
+    def do_create_room(self,c, request):
         """
             创建群聊室
         :param c:
         :param request:
         :return:
         """
-        pass
+        uid = request['uid']
+        rid = request['rid']
+        rname = request['rname']
+        msg = {"style":"C",'rid':rid,'rname':rname}
+        if self.sql.veriaty_room_id(rid):
+            msg['re'] = "yes"
+            # 将成功创建的群加入到数据库中
+            self.sql.insert_rooms(rid,uid,rname)
+            # 将用户加入到用户群数据库中
+            self.sql.insert_room_user(rid,uid)
+        else:
+            msg['re'] = "no"
+        msg = json.dumps(msg)
+        c.send(msg.encode())
+
 
     def do_group_chat(self,c,request):
         """
             群聊消息
+            获取群成员
+            通过群成员逐个发送消息
+            信息转发给群成员
         :param c:
         :param request:
         :return:
         """
-        pass
+        uid = request['uid']
+        rid = request['rid']
+        # 通过rid获取群成员
+        room_user = self.sql.get_room_user_by_rid(rid)
+        # 通过用户转发消息
+        self.tool.send_rooms_msg(uid,request,room_user)
 
-            
 
-            
+    def do_add_room(self,c,request):
+        """
+            好友加入群
+            1.先判断群是否存在
+            2.存在即通过
+        :param c:
+        :param request:
+        :return:
+        """
+        uid = request['uid']
+        rid = request['rid']
+        msg = {"style": "J", 'rid': rid}
+        if self.sql.veriaty_room_id(rid):
+            msg['re'] = "yes"
+            # 将用户加入到用户群数据库中
+            self.sql.insert_room_user(rid, uid)
+            # 通知群里的成员
+            room_user = self.sql.get_room_user_by_rid(rid)
+            new_msg = {"style":"M",'rid':rid,'uid':uid,'msg':"%s加入群聊"%uid}
+            self.tool.send_rooms_msg(uid,new_msg,room_user)
+            # 查找群昵称
+            rname = self.sql.get_rname_by_rid(rid)
+            msg['rname'] = rname
+        else:
+            msg['re'] = "no"
+        msg = json.dumps(msg)
+        c.send(msg.encode())
 
 
-            
+
 
 
 

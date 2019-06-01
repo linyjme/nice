@@ -6,9 +6,6 @@
 """
 from socket import *
 import sys, os
-import pymysql
-import signal
-from multiprocessing import Process
 from threading import Thread
 from config import *
 from sql_db import *
@@ -19,7 +16,7 @@ import json
 ADDR = (SERVER_IP, PORT)
 
 # 处理僵尸进程
-signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+# signal.signal(signal.SIGCHLD, signal.SIG_IGN)
 
 
 # 初始化全局变量
@@ -69,15 +66,6 @@ class Server(object):
             except Exception as e:
                 print(e)
                 continue
-            # 创建子进程
-            # pid = os.fork()
-            # if pid == 0:
-            #     self.sockfd.close()
-            #     # 处理客户端请求
-            #     do_request(c,addr)
-            #     sys.exit()
-            # else:
-            #     c.close()
             # 使用多线程
             client = Thread(target=do_request, args=(c, addr))
             client.setDaemon(True)
@@ -92,7 +80,7 @@ def do_request(c, addr):
     re = Response()
     while True:
         try:
-            data = c.recv(1024).decode()
+            data = c.recv(4096).decode()
         except Exception as e:
             re.do_user_exit(c)
             return
@@ -125,13 +113,16 @@ def do_request(c, addr):
             re.do_friends_reply(c, request)
         elif request['style'] == 'C':
             # 创建群聊房间
-            re.do_create_romm(c, request)
+            re.do_create_room(c, request)
         elif request['style'] == 'N':
             # 私聊
             re.do_priv_chat(c, request)
         elif request['style'] == 'M':
             # 群聊
             re.do_group_chat(c, request)
+        elif request['style'] == 'J':
+            # 加群
+            re.do_add_room(c,request)
 
 
 if __name__ == '__main__':
@@ -148,3 +139,13 @@ if __name__ == '__main__':
     # client = Thread(target= do_request,args=(c,addr))
     # client.setDaemon(True)
     # client.start()
+
+    # 创建子进程
+    # pid = os.fork()
+    # if pid == 0:
+    #     self.sockfd.close()
+    #     # 处理客户端请求
+    #     do_request(c,addr)
+    #     sys.exit()
+    # else:
+    #     c.close()

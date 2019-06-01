@@ -93,10 +93,10 @@ class Sql_tool():
         """
         temp_list = []
         sql = "select user_id2 from friends where user_id1 = '%s' " % uid
-        result01 = self.sql_tool.cur.execute(sql)
+        self.sql_tool.cur.execute(sql)
         result01 = self.sql_tool.cur.fetchall()
         sql = "select user_id1 from friends where user_id2 = '%s' " % uid
-        result02 = self.sql_tool.cur.execute(sql)
+        self.sql_tool.cur.execute(sql)
         result02 = self.sql_tool.cur.fetchall()
         result = result01 + result02
         if result == None:
@@ -112,10 +112,10 @@ class Sql_tool():
             查询是否是好友
         """
         sql01 = "select * from friends where user_id1 = '%s' and user_id2 = '%s'" % (user_id1,user_id2)
-        result01 = self.sql_tool.cur.execute(sql01)
+        self.sql_tool.cur.execute(sql01)
         result01 = self.sql_tool.cur.fetchone()
         sql02 = "select * from friends where user_id2 = '%s' and user_id1 = '%s'" % (user_id1,user_id2)
-        result02 = self.sql_tool.cur.execute(sql02)
+        self.sql_tool.cur.execute(sql02)
         result02 = self.sql_tool.cur.fetchone()
         if result01 or result02:
             return True
@@ -134,6 +134,87 @@ class Sql_tool():
         # 结果是一个元组，需要将元组转换为字符串
         result = ''.join(result)
         return result
+
+
+    def insert_rooms(self,room_id,uid,room_name):
+        """
+            插入创建的群号到数据库
+        :param uid:
+        :param room_id:
+        :param room_name:
+        :return:
+        """
+        sql = "insert into rooms values ('%s','%s','%s')" % (room_id, uid, room_name,)
+        try:
+            self.sql_tool.cur.execute(sql)
+            self.sql_tool.db_conn.commit()
+            return True
+        except Exception as e:
+            print(e)
+            self.sql_tool.db_conn.rollback()
+            return False
+
+    def insert_room_user(self,room_id,room_user):
+        """
+            插入群的成员
+        :param uid:
+        :param room_id:
+        :return:
+        """
+        sql = "insert into room_user (room_id, room_user) values ('%s','%s')" % (room_id, room_user)
+        try:
+            self.sql_tool.cur.execute(sql)
+            self.sql_tool.db_conn.commit()
+            return True
+        except Exception as e:
+            print(e)
+            self.sql_tool.db_conn.rollback()
+            return False
+
+    def veriaty_room_id(self,room_id):
+        """
+            验证创建的群是否唯一
+        :param room_id:
+        :return:
+        """
+        sql = "select * from rooms where room_id = '%s'" % room_id
+        self.sql_tool.cur.execute(sql)
+        r = self.sql_tool.cur.fetchone()
+        if r != None:
+            return False
+        else:
+            return True
+
+    def get_rname_by_rid(self,room_id):
+        """
+            通过rid查找群名
+        :param rid:
+        :return:
+        """
+        sql = "select uname from rooms where room_id = '%s'" % room_id
+        self.sql_tool.cur.execute(sql)
+        result = self.sql_tool.cur.fetchone()
+        # 结果是一个元组，需要将元组转换为字符串
+        result = ''.join(result)
+        return result
+
+
+    def get_room_user_by_rid(self,room_id):
+        """
+            通过群room_id获取群成员
+        :param room_id:
+        :return:
+        """
+        temp_list = []
+        sql = "select room_user from room_user where user_id1 = '%s' " % room_id
+        self.sql_tool.cur.execute(sql)
+        result = self.sql_tool.cur.fetchall()
+        for i in result:
+            temp_list.append(''.join(i))
+        # 此时temp_list 为用户所有好友的账号
+        return temp_list
+
+
 
 
 
@@ -155,5 +236,6 @@ if __name__ == "__main__":
     # print(result)
     # print(type(result))
     # result = re.insert_chat_history('1235','456','hah我是')
-    result = re.query_is_friend('12369874105','12345678910')
+    # result = re.query_is_friend('12369874105','12345678910')
+    result = re.insert_room_user('147258',"123456")
     print(result)

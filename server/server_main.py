@@ -11,6 +11,7 @@ from config import *
 from sql_db import *
 from response import *
 import json
+import pymysql
 
 # 服务器地址
 ADDR = (SERVER_IP, PORT)
@@ -70,7 +71,6 @@ class Server(object):
             client = Thread(target=do_request, args=(c, addr))
             client.setDaemon(True)
             client.start()
-
 
 def do_request(c, addr):
     """

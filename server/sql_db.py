@@ -3,6 +3,7 @@
 """
 
 import pymysql
+pymysql.install_as_MySQLdb()
 import sys
 from config import *
 
@@ -33,7 +34,7 @@ class MySql(object):
             self.create_group_room()
             self.create_room_user()
         else:
-            print("数据库chat已存在，请自行检查")
+            print("数据库chat已存在,请检查")
             
 
     def open_conn(self):
@@ -42,8 +43,7 @@ class MySql(object):
         """
         try:
             # 建立连接对象
-            conn = pymysql.connect(self.db_conf.host, self.db_conf.user, self.db_conf.passwd,
-                                           charset='utf8')
+            conn = pymysql.connect(self.db_conf.host, self.db_conf.user, self.db_conf.passwd,charset='utf8')
         except Exception as e:
             print("连接数据库错误")
             print(e)

@@ -1,0 +1,26 @@
+一、建立单独客户端启动类Client
+    属性:用于建立基于TCP协议的socket套接字
+    方法:start()启动连接
+
+二、逻辑处理器类ClientManager()
+    属性:继承的socket套接字
+    方法:
+        1. 注册:register(uid,upwd,uname)
+            参数:见名知义
+        2. 登录:login(uid,upwd)
+            参数:见名知义
+        3. 聊天界面实现:
+
+
+主界面窗口:
+    style:"S"
+1. 好友的账号,昵称
+2. 好友的请求
+3. 好友的消息
+
+主窗口功能:
+1. 添加好友
+    style:"F" , uid:""
+2. 创建群
+3. 好友聊天
+    style:"M" , uid:"" , msg:""

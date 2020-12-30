@@ -1,15 +1,15 @@
-# NodePress
+# Nice
 
 **RESTful API service for [nice.me](https://github.com/nice.me) blog, powered by [nestjs](https://github.com/nestjs/nest), required [mongoDB](https://www.mongodb.com/) & [Redis](https://redis.io/).** 
 
-**适用于 [surmon.me](https://github.com/nice.me) 的 RESTful API 服务；基于 [nestjs](https://github.com/nestjs/nest) (nodejs)；
+**适用于 [niceme](https://github.com/nice.me) 的 RESTful API 服务；基于 [nestjs](https://github.com/nestjs/nest) (nodejs)；
 需安装 [mongoDB](https://www.mongodb.com/) 和 [Redis](https://redis.io/) 方可完整运行。**
 
 
 **其他相关项目：**
-- **web client for user:** [surmon.me](https://github.com/nice.me) powered by [Nuxt.js](https://github.com/nuxt/nuxt.js)
-- **web client for admin:** [angular-admin](https://github.com/nice.admin) powered by [Angular](https://github.com/angular/angular) & [Bootstrap](https://github.com/twbs/bootstrap)
-- **native app client:** [surmon.me.native](https://github.com/nice.me.native) powered by [react-native](https://github.com/facebook/react-native)
+- **web client for user:** [nice.me](https://github.com/nice.me) powered by [Nuxt.js](https://github.com/nuxt/nuxt.js)
+- **web client for admin:** [nice.admin](https://github.com/nice.admin) powered by [Angular](https://github.com/angular/angular) & [Bootstrap](https://github.com/twbs/bootstrap)
+- **native app client:** [nice.me.native](https://github.com/nice.me.native) powered by [react-native](https://github.com/facebook/react-native)
 
 
 

@@ -7,7 +7,7 @@ logs
 .idea
 # vscode
 .vscode
-
+__pycache__
 # test
 test.*
 

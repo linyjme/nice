@@ -1,0 +1,101 @@
+”“”
+    mysql数据库设计说明
+“”“
+
+
+    用户表：
+            user
+        用户ID:user_id
+        用户名:user_name
+        用户密码:user_passwd
+	    用户ID状态:user_stateID
+	    //用户性别:User_sex
+	    //用户年龄:User_age
+
+
+    聊天记录表：
+            chat_history
+        历史消息ID:historyID
+        发送时间：send_time
+	    //接收状态:M_status
+	    发送方用户ID:fromID
+	    接收方用户ID:userID
+        //消息内容:Content
+        //聊天日期:Chat_time
+
+    好友表：
+            Friends
+        本人ID：owner_id
+        好友ID：friend_id
+	    //备注名:
+	    好友类型:friend_type
+	    好友分组:friend_group
+
+    好友分组表:
+	    friend_groups
+	    分组ID:fg_id
+	    分组名称:fg_name
+	    用户ID:fg_userID
+
+    好友类型表:
+	    friend_type
+	    类型ID:ft_id
+	    类型名称:ft_name
+
+    用户群表:
+	    user_groups
+	    群ID:ug_id
+	    群名称:ug_name
+	    群创建时间:ug_createtime
+	    //群主ID:UG_AdminID
+	    //群图标:UG_ICon
+	    //群公告:UG_Notice
+	    群简介:ug_intro
+
+    群用户关联表:
+	    groups_to_user
+        主键:gt_id
+        用户ID:gt_userID
+        群ID:gt_groupID
+        发送时间:gt_createtime
+        群内用户昵称:gt_groupnick
+
+    群消息内容表:
+	    groups_message
+        群消息ID:gm_id
+        消息内容:gm_content
+        发送者ID:gm_fromID
+        发送者昵称:gm_fromname
+        发送时间:gm_createtime
+
+     群消息关联表:
+	    groups_to_user
+        主键:gt_id
+        群消息ID:gt_messageID
+        接收者ID:gt_userID
+        接收状态:gt_state
+        发送时间:gt_createtime
+
+     群内私聊消息关联表:
+	    groups_message_user_to_user
+        主键:gu_id
+        消息内容:gu_msgcontent
+        发送者ID:gu_fromuserID
+        发送者昵称:gu_fromusername
+        发送时间:gu_createtime
+        接收者ID:gu_touserID
+        接收状态:gu_state
+        所属群ID:gu_usergroupID
+
+
+    聊天室:
+            定义三种房间
+	1.用户刚登陆时的房间(LoginRoom)
+	2.聊天房间(ChatRoom)
+	3.退出登录时的房间(LogoutRoom)
+
+    聊天室用户
+            room_user
+        编号id：
+        房间名room_name:
+        用户id：
